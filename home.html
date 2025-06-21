@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Warm Code - A New Kind of Community</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌻</text></svg>">
     <style>
         /* Microsoft AI Typography Token System Implementation */
         :root {
@@ -239,21 +240,22 @@
             text-decoration: none;
             transition: all var(--duration-primary) var(--easing-smooth);
             position: relative;
+            font-style: normal;
+            font-weight: var(--font-weight-regular);
+        }
+
+        .nav-link:hover {
+            font-style: italic;
+        }
+
+        .nav-link:active,
+        .nav-link.active {
+            font-weight: var(--font-weight-semibold);
+            font-style: normal;
         }
 
         .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: width 0.3s ease;
-        }
-
-        .nav-link:hover::after {
-            width: 100%;
+            display: none;
         }
 
         /* Hamburger Menu */
@@ -307,7 +309,7 @@
         }
 
         .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(0px, 8px);
+            transform: rotate(45deg) translate(6px, 6px);
         }
 
         .hamburger.active span:nth-child(2) {
@@ -316,7 +318,7 @@
         }
 
         .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(0px, -8px);
+            transform: rotate(-45deg) translate(6px, -6px);
         }
 
         /* Mobile Menu */
@@ -355,7 +357,7 @@
         }
 
         .mobile-menu .nav-link {
-            font-size: 16px;
+            font-size: 24px;
             font-weight: var(--font-weight-medium);
             padding: 20px 40px;
             color: var(--primary);
@@ -838,15 +840,6 @@
             <p class="text-intro-serif fade-in stagger-2" style="max-width: 600px; margin: 0 auto var(--spacing-lg); position: relative; z-index: 3;">
                 Technology that listens. Tools that care.
             </p>
-            
-            <div class="fade-in stagger-3" style="display: flex; gap: var(--spacing-md); justify-content: center; flex-wrap: wrap; margin-bottom: var(--spacing-xl); position: relative; z-index: 3;">
-                <a href="#join" class="btn-primary">
-                    Join Our Community
-                </a>
-                <a href="#about" class="btn-glass">
-                    Read Our Story
-                </a>
-            </div>
         </div>
     </section>
 
@@ -905,7 +898,7 @@
                 Let's Begin Together
             </h2>
             
-            <a href="https://groupme.com/join_group/your-group-id" class="btn-primary" style="background: var(--surface); color: var(--primary); margin-bottom: var(--spacing-lg);">
+            <a href="https://groupme.com/join_group/108067921/2aniai3A" class="btn-primary" style="background: var(--surface); color: var(--primary); margin-bottom: var(--spacing-lg);">
                 Join Our Community
             </a>
             

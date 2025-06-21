@@ -3,41 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warm Code - Sunflower Art Header</title>
+    <title>Warm Code - A New Kind of Community</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌻</text></svg>">
     <style>
-        :root {
-            --primary: #2A1816;
-            --surface: #FBF8F0;
-            --background: #FFECB3;
-            --warm-white: #FFF8F3;
-            --glass-bg: rgba(252, 249, 246, 0.6);
-        }
-        body {
-            font-family: "Aptos", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--warm-white);
-            color: var(--primary);
-            margin: 0;
-            overflow-x: hidden;
-        }
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            z-index: 100;
-        }
+        /* ...Your existing CSS here... */
         .nav-glass {
-            background: var(--glass-bg);
+            background: rgba(252, 249, 246, 0.6);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.16), 0px 1px 2px rgba(0, 0, 0, 0.08);
             border-radius: 100px;
             margin: 1.5rem auto 0 auto;
             max-width: 700px;
             padding: 1rem 2.5rem;
             display: flex;
             justify-content: center;
+            box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.16), 0px 1px 2px rgba(0, 0, 0, 0.08);
         }
         .nav-list {
             display: flex;
@@ -47,7 +27,7 @@
             padding: 0;
         }
         .nav-link {
-            color: var(--primary);
+            color: #2A1816;
             text-decoration: none;
             font-weight: 500;
             font-size: 1.1rem;
@@ -56,6 +36,51 @@
         .nav-link:hover {
             color: #F3E0A7;
         }
+        .hero-section {
+            min-height: 100vh;
+            background: #FFECB3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            padding: 6.25rem;
+        }
+        .text-hero {
+            font-family: "Aptos Display", "Segoe UI Variable", system-ui, sans-serif;
+            font-size: clamp(4rem, 8vw, 7.5rem);
+            font-weight: 300;
+            line-height: 1.2;
+            letter-spacing: -0.04em;
+            margin-bottom: 2.5rem;
+        }
+        .btn-primary {
+            background: #2A1816;
+            color: #FBF8F0;
+            border: none;
+            border-radius: 100px;
+            padding: 1rem 2.5rem;
+            font-family: "Aptos", "Segoe UI", system-ui, sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 1.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            min-height: 52px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        /* Sunflower follower styles */
         .sunflower-follower {
             position: fixed;
             pointer-events: none;
@@ -87,22 +112,6 @@
         .sunflower-follower img.fading {
             opacity: 0;
         }
-        .hero-section {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #FFECB3;
-        }
-        .hero-content {
-            text-align: center;
-        }
-        .text-hero {
-            font-size: clamp(3rem, 8vw, 6rem);
-            font-weight: 300;
-            margin-bottom: 1.5rem;
-            font-family: "Aptos Display", "Segoe UI Variable", system-ui, sans-serif;
-        }
     </style>
 </head>
 <body>
@@ -114,7 +123,6 @@
                 <li><a href="#" class="nav-link">Community</a></li>
             </ul>
         </nav>
-        <!-- Sunflower follower image container -->
         <div class="sunflower-follower" id="sunflowerFollower"></div>
     </header>
     <main>
@@ -122,21 +130,36 @@
             <div class="hero-content">
                 <h1 class="text-hero">Warm Code</h1>
                 <p style="font-size:1.25rem;">A New Kind of Community</p>
+                <a href="#" class="btn-primary">Join Us</a>
             </div>
         </section>
     </main>
     <script>
-        // Helper: fetch new sunflower art images from Unsplash
+        // Multiple query variations for more variety
+        const queries = [
+          "sunflower,art",
+          "sunflower,painting",
+          "sunflower,botanical",
+          "sunflower,drawing",
+          "sunflower,nature,closeup"
+        ];
+        // Fetch a new sunflower image from Unsplash
         function fetchSunflowerImage() {
-            // Unsplash random sunflower art query (cache-busting param for uniqueness)
-            return "https://source.unsplash.com/400x400/?sunflower,art&" + Date.now() + Math.random();
+          const q = queries[Math.floor(Math.random() * queries.length)];
+          return `https://source.unsplash.com/400x400/?${q}&` + Date.now() + Math.random();
         }
+
+        // Preload first two images for better perceived performance
+        const preloadImages = [fetchSunflowerImage(), fetchSunflowerImage()];
+        preloadImages.forEach(src => {
+          const img = new Image();
+          img.src = src;
+        });
 
         const header = document.getElementById('header');
         const follower = document.getElementById('sunflowerFollower');
-        let images = []; // Active images (img elements)
+        let images = [];
         let isActive = false;
-        let mouseX = 0, mouseY = 0;
 
         // Show follower on header hover
         header.addEventListener('mouseenter', () => {
@@ -155,10 +178,10 @@
 
         // Move follower to cursor
         header.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX - follower.offsetWidth/2;
-            mouseY = e.clientY - follower.offsetHeight/2;
-            follower.style.left = mouseX + 'px';
-            follower.style.top = mouseY + 'px';
+            const offsetX = follower.offsetWidth / 2;
+            const offsetY = follower.offsetHeight / 2;
+            follower.style.left = (e.clientX - offsetX) + 'px';
+            follower.style.top = (e.clientY - offsetY) + 'px';
         });
 
         // Add new sunflower image to the follower
@@ -169,7 +192,6 @@
             img.onload = () => {
                 img.style.opacity = 1;
             };
-            // Position absolutely inside follower
             img.style.position = "absolute";
             img.style.left = "0";
             img.style.top = "0";

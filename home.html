@@ -1005,11 +1005,11 @@
             });
         });
 
-        // EXACT COPY of your PERFECT working code - FIXED
+        // Unsplash API compliant implementation
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Using your PERFECT working implementation - FIXED');
+            console.log('Initializing Unsplash API compliant sunflower garden');
             
-            // Unsplash API access key (DO NOT SHARE PUBLICLY IN PRODUCTION)
+            // Unsplash API access key
             const accessKey = 'jZCf2kOeK-ikoqzW9byfWYkof_guaJv1IEJqL-8NAFY';
             const query = 'sunflower';
 
@@ -1029,75 +1029,148 @@
             });
 
             const heroSection = document.getElementById('home');
-            const sunflowerGarden = document.getElementById('sunflowerGarden'); // Use the proper container!
+            const sunflowerGarden = document.getElementById('sunflowerGarden');
+            
+            // Add attribution element
+            let attributionElement = document.getElementById('photo-attribution');
+            if (!attributionElement) {
+                attributionElement = document.createElement('div');
+                attributionElement.id = 'photo-attribution';
+                attributionElement.style.cssText = `
+                    position: fixed;
+                    bottom: 10px;
+                    right: 10px;
+                    z-index: 10000;
+                    background: rgba(255,255,255,0.9);
+                    padding: 6px 12px;
+                    border-radius: 6px;
+                    font-size: 12px;
+                    font-family: var(--font-family-sans);
+                    max-width: 300px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                `;
+                document.body.appendChild(attributionElement);
+            }
+            
             let mouseX = 0, mouseY = 0;
             let lastUnsplashImage = '';
-            let lastUnsplashAttribution = '';
+            let lastUnsplashData = null;
             let usedImages = [];
-            const maxRecentImages = 5; // Don't reuse the same image until at least 5 others have been shown
+            const maxRecentImages = 5;
             let lastAddTime = 0;
-            const minAddInterval = 1500; // 1.5 seconds between images
-            const maxImages = 10;
+            const minAddInterval = 1500;
+            const maxImages = 8;
 
             heroSection.addEventListener('mousemove', (e) => {
                 mouseX = e.clientX;
                 mouseY = e.clientY;
             });
 
+            // Trigger download endpoint (required by Unsplash API)
+            async function triggerDownload(downloadUrl) {
+                try {
+                    await fetch(downloadUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Client-ID ${accessKey}`
+                        }
+                    });
+                    console.log('Download event triggered');
+                } catch (error) {
+                    console.error('Failed to trigger download:', error);
+                }
+            }
+
             async function fetchSunflowerImage() {
                 try {
-                    // Only reuse cached Unsplash image if it hasn't been used recently
-                    if (Math.random() < 0.66 && lastUnsplashImage && !usedImages.includes(lastUnsplashImage)) {
-                        const result = { url: lastUnsplashImage, attribution: lastUnsplashAttribution };
-                        usedImages.push(lastUnsplashImage);
+                    // Reuse cached image occasionally
+                    if (Math.random() < 0.4 && lastUnsplashData && !usedImages.includes(lastUnsplashData.id)) {
+                        usedImages.push(lastUnsplashData.id);
                         if (usedImages.length > maxRecentImages) usedImages.shift();
-                        return result;
+                        
+                        // Update attribution
+                        attributionElement.innerHTML = `Photo by <a href="${lastUnsplashData.user.links.html}?utm_source=warm_code&utm_medium=referral" target="_blank" style="color: #007acc; text-decoration: none;">${lastUnsplashData.user.name}</a> on <a href="https://unsplash.com/?utm_source=warm_code&utm_medium=referral" target="_blank" style="color: #007acc; text-decoration: none;">Unsplash</a>`;
+                        
+                        // Trigger download (required)
+                        triggerDownload(lastUnsplashData.links.download_location);
+                        
+                        return { 
+                            url: lastUnsplashData.urls.regular,
+                            source: 'unsplash-cached'
+                        };
                     }
+
                     const response = await fetch(`https://api.unsplash.com/photos/random?query=${query}&client_id=${accessKey}`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
                     const data = await response.json();
-                    lastUnsplashImage = data.urls.regular;
-                    lastUnsplashAttribution = `Photo by <a href="${data.user.links.html}" target="_blank">${data.user.name}</a> on <a href="https://unsplash.com" target="_blank">Unsplash</a>`;
-                    usedImages.push(lastUnsplashImage);
+                    lastUnsplashData = data;
+                    usedImages.push(data.id);
                     if (usedImages.length > maxRecentImages) usedImages.shift();
-                    return { url: lastUnsplashImage, attribution: lastUnsplashAttribution };
+                    
+                    // Update attribution with proper UTM tracking
+                    attributionElement.innerHTML = `Photo by <a href="${data.user.links.html}?utm_source=warm_code&utm_medium=referral" target="_blank" style="color: #007acc; text-decoration: none;">${data.user.name}</a> on <a href="https://unsplash.com/?utm_source=warm_code&utm_medium=referral" target="_blank" style="color: #007acc; text-decoration: none;">Unsplash</a>`;
+                    
+                    // Trigger download (required by Unsplash API)
+                    triggerDownload(data.links.download_location);
+                    
+                    return { 
+                        url: data.urls.regular,
+                        source: 'unsplash'
+                    };
+                    
                 } catch (error) {
                     console.error('Error fetching Unsplash image:', error);
-                    // Pick a Pixabay image that hasn't been used recently
+                    
+                    // Fallback to Pixabay
                     let pixabayImage;
                     do {
                         pixabayImage = pixabayImages[Math.floor(Math.random() * pixabayImages.length)];
                     } while (usedImages.includes(pixabayImage) && pixabayImages.length > 1);
+                    
                     usedImages.push(pixabayImage);
                     if (usedImages.length > maxRecentImages) usedImages.shift();
-                    return { url: pixabayImage, attribution: 'Image from <a href="https://pixabay.com" target="_blank">Pixabay</a>' };
+                    
+                    // Update attribution for Pixabay
+                    attributionElement.innerHTML = `Image from <a href="https://pixabay.com" target="_blank" style="color: #007acc; text-decoration: none;">Pixabay</a>`;
+                    
+                    return { 
+                        url: pixabayImage,
+                        source: 'pixabay'
+                    };
                 }
             }
 
             async function addNewSunflowerImage() {
-                if (sunflowerGarden.querySelectorAll('.sunflower-image').length >= maxImages) return; // Check in proper container
+                if (sunflowerGarden.querySelectorAll('.sunflower-image').length >= maxImages) return;
                 if (Date.now() - lastAddTime < minAddInterval) return;
                 lastAddTime = Date.now();
 
-                const { url, attribution } = await fetchSunflowerImage();
+                const { url, source } = await fetchSunflowerImage();
+                console.log(`Loading sunflower from ${source}`);
+                
                 const img = document.createElement('img');
                 img.className = 'sunflower-image';
                 img.style.cssText = `
                     position: absolute;
-                    width: 180px;
-                    height: 180px;
+                    width: 140px;
+                    height: 140px;
                     border-radius: 50%;
                     box-shadow: 0 4px 24px rgba(0,0,0,0.13);
                     opacity: 0;
                     object-fit: cover;
                     pointer-events: none;
-                    z-index: 9999;
+                    z-index: 10;
                     transform: translate(-50%, -50%) scale(0.7);
                     transition: transform 0.8s ease-out, opacity 1.2s;
                 `;
                 img.style.left = mouseX + 'px';
                 img.style.top = mouseY + 'px';
                 img.src = url;
-                sunflowerGarden.appendChild(img); // FIXED: Use proper container
+                sunflowerGarden.appendChild(img);
 
                 setTimeout(() => {
                     img.style.opacity = 1;
@@ -1106,17 +1179,20 @@
 
                 setTimeout(() => {
                     img.classList.add('fading');
+                    img.style.opacity = 0;
                     setTimeout(() => {
-                        img.remove();
+                        if (img.parentNode) {
+                            img.remove();
+                        }
                     }, 1200);
-                }, 7000);
+                }, 6000);
             }
 
             heroSection.addEventListener('mousemove', () => {
                 addNewSunflowerImage();
             });
             
-            console.log('PERFECT working sunflower garden ready! 🌻');
+            console.log('Unsplash API compliant sunflower garden ready! 🌻');
         });
 
         // Add staggered animation for practice items on scroll
